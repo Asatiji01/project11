@@ -3,7 +3,7 @@ import axios from 'axios';
 const isDevelopment = process.env.NODE_ENV === 'development';
 const BASE_URL = isDevelopment 
     ? 'http://localhost:8000'
-    : 'https://expense-tracker-app-knl1.onrender.com';
+    : 'https://project11-10.onrender.com';
 
 const api = axios.create({
     baseURL: BASE_URL,
