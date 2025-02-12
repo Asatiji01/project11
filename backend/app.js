@@ -12,54 +12,65 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Connect to MongoDB
+// Connect to MongoDB
 connectDB();
 
-// ✅ Allowed Frontend Domains
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://project11-10.onrender.com",  // ✅ Backend
-  "https://project11-ywod.vercel.app",  // ✅ Frontend
+  "http://localhost:8000",
+  "https://main.d1sj7cd70hlter.amplifyapp.com",
+  "https://expense-tracker-app-three-beryl.vercel.app",
+  "https://expense-tracker-app-knl1.onrender.com",
+  "https://expenstrackkerr.vercel.app",
+  "https://expenstrackkerr-qerlln72k-devanshus-projects-9b36d403.vercel.app",
+  /^https:\/\/expenstrackkerr.*\.vercel\.app$/,
+  "https://project11-ywod.vercel.app",
   "https://project11-ywod-git-main-devanshus-projects-9b36d403.vercel.app",
-  /^https:\/\/project11-ywod.*\.vercel\.app$/  // ✅ Allow any Vercel preview
+  "https://project11-ywod-n3dje3d1r-devanshus-projects-9b36d403.vercel.app"
 ];
 
-// ✅ CORS Middleware
+// CORS Configuration
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);  // Allow non-browser requests
+    if (!origin) return callback(null, true);
     
     if (allowedOrigins.includes(origin) || allowedOrigins.some(pattern => pattern instanceof RegExp && pattern.test(origin))) {
       return callback(null, true);
     }
-
+    
     console.log("🚫 Blocked by CORS:", origin);
-    return callback(new Error("Not allowed by CORS"));
+    callback(new Error("Not allowed by CORS"));
   },
-  credentials: true, 
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  exposedHeaders: ["Access-Control-Allow-Origin"],
   optionsSuccessStatus: 200
 }));
 
-// ✅ Additional Security Headers
+// ✅ Handle preflight requests (OPTIONS) globally
+app.options("*", cors());
+
+// ✅ Force CORS headers in all responses
 app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin) || allowedOrigins.some(pattern => pattern instanceof RegExp && pattern.test(origin))) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  
-  if (allowedOrigins.includes(req.headers.origin) || allowedOrigins.some(pattern => pattern instanceof RegExp && pattern.test(req.headers.origin))) {
-    res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
-  }
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
-  
+
   next();
 });
 
-// ✅ Security Middlewares
+// Security & Logging Middleware
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("dev"));
@@ -67,27 +78,38 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// ✅ API Routes
+// API Routes
 app.use("/api/v1", transactionRoutes);
 app.use("/api/auth", userRoutes);
 
-// ✅ Test Route
+// Default Route
 app.get("/", (req, res) => {
-  res.send("Hello World! Backend is running.");
+  res.send("Hello World!");
 });
 
-// ✅ Error Handling Middleware
+// Health Check Route
+app.get("/health", (req, res) => {
+  res.status(200).json({ success: true, message: "Server is healthy!" });
+});
+
+// Error Handling Middleware
+app.use((req, res, next) => {
+  const error = new Error("Not Found");
+  error.status = 404;
+  next(error);
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({
+  res.status(err.status || 500).json({
     success: false,
-    message: "Something went wrong!",
-    error: process.env.NODE_ENV === "development" ? err.message : undefined
+    message: err.message,
+    error: process.env.NODE_ENV === "development" ? err.stack : undefined
   });
 });
 
-// ✅ Start Server
+// Start Server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on https://project11-10.onrender.com`);
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
