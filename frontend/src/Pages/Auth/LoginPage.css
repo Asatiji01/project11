@@ -1,0 +1,9 @@
+/* Add this to your CSS (e.g., LoginPage.css) */
+.login-slide {
+  transform: translateX(100%);
+  transition: transform 0.6s ease-out;
+}
+
+.login-slide.active {
+  transform: translateX(0);
+}
