@@ -22,37 +22,62 @@ const allowedOrigins = [
   "https://expense-tracker-app-three-beryl.vercel.app",
   "https://expense-tracker-app-knl1.onrender.com",
   "https://expenstrackkerr.vercel.app",
-  "https://expenstrackkerr-qerlln72k-devanshus-projects-9b36d403.vercel.app" // Added your frontend origin here
+  "https://expenstrackkerr-qerlln72k-devanshus-projects-9b36d403.vercel.app",
+  /^https:\/\/expenstrackkerr.*\.vercel\.app$/
 ];
 
-// CORS Middleware Setup
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // Check exact matches first
     if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('Blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
+      return callback(null, true);
     }
+    
+    // Check regex patterns
+    const isAllowedByPattern = allowedOrigins.some(allowed => {
+      if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return false;
+    });
+    
+    if (isAllowedByPattern) {
+      return callback(null, true);
+    }
+    
+    console.log('Blocked origin:', origin);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Access-Control-Allow-Origin'],
   optionsSuccessStatus: 200
 }));
 
-// Additional Headers for CORS
+// Additional headers middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  const origin = req.headers.origin;
+  // Check both exact matches and patterns
+  const isAllowed = allowedOrigins.some(allowed => {
+    if (allowed instanceof RegExp) {
+      return allowed.test(origin);
+    }
+    return allowed === origin;
+  });
+  
+  if (isAllowed) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   
   if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // Preflight request
+    return res.status(200).end();
   }
   next();
 });
@@ -65,7 +90,6 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// Routes
 app.use("/api/v1", transactionRoutes);
 app.use("/api/auth", userRoutes);
 
@@ -73,7 +97,6 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
