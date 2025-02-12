@@ -24,6 +24,9 @@ const allowedOrigins = [
   "https://expenstrackkerr.vercel.app",
   "https://expenstrackkerr-qerlln72k-devanshus-projects-9b36d403.vercel.app",
   /^https:\/\/expenstrackkerr.*\.vercel\.app$/
+  "https://project11-ywod.vercel.app"
+"https://project11-ywod-git-main-devanshus-projects-9b36d403.vercel.app"
+"https://project11-ywod-n3dje3d1r-devanshus-projects-9b36d403.vercel.app"
 ];
 
 app.use(cors({
