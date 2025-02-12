@@ -1,5 +1,5 @@
 import User from "../models/UserSchema.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 // Register Controller
 export const registerControllers = async (req, res, next) => {
