@@ -55,7 +55,7 @@ const Home = () => {
     const avatarFunc = async () => {
       if (localStorage.getItem("user")) {
         const user = JSON.parse(localStorage.getItem("user"));
-        console.log(user);
+
 
         if (user.isAvatarImageSet === false || user.avatarImage === "") {
           navigate("/setAvatar");
