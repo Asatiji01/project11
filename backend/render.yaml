@@ -1,0 +1,18 @@
+// filepath: /d:/react/Expense/backend/render.yaml
+services:
+  - type: web
+    name: expense-backend
+    env: node
+    plan: free
+    buildCommand: 'npm install'
+    startCommand: 'node server.js'
+    envVars:
+      - key: MONGO_URI
+        value: mongodb+srv://prashantasati4:dev01@cluster0.3de95.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - key: PORT
+        value: 8000
+      - key: NODE_ENV
+        value: development
+      - key: JWT_SECRET
+        value: your_jwt_secret
+        
