@@ -21,13 +21,13 @@ const allowedOrigins = [
   "http://localhost:8000",
   "https://main.d1sj7cd70hlter.amplifyapp.com",
   "https://expense-tracker-app-three-beryl.vercel.app",
-  "https://expense-tracker-app-knl1.onrender.com"
+  "https://expense-tracker-app-knl1.onrender.com",
+  "https://expenstrackkerr.vercel.app"
 ];
 
 
 app.use(cors({
   origin: function (origin, callback) {
- 
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.includes(origin)) {
