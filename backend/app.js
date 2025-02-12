@@ -23,10 +23,10 @@ const allowedOrigins = [
   "https://expense-tracker-app-knl1.onrender.com",
   "https://expenstrackkerr.vercel.app",
   "https://expenstrackkerr-qerlln72k-devanshus-projects-9b36d403.vercel.app",
-  /^https:\/\/expenstrackkerr.*\.vercel\.app$/
-  "https://project11-ywod.vercel.app"
-"https://project11-ywod-git-main-devanshus-projects-9b36d403.vercel.app"
-"https://project11-ywod-n3dje3d1r-devanshus-projects-9b36d403.vercel.app"
+  /^https:\/\/expenstrackkerr.*\.vercel\.app$/,
+  "https://project11-ywod.vercel.app",
+  "https://project11-ywod-git-main-devanshus-projects-9b36d403.vercel.app",
+  "https://project11-ywod-n3dje3d1r-devanshus-projects-9b36d403.vercel.app"
 ];
 
 app.use(cors({
@@ -100,12 +100,24 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ success: true, message: "Server is healthy!" });
+});
+
+// Error handling middleware
+app.use((req, res, next) => {
+  const error = new Error('Not Found');
+  error.status = 404;
+  next(error);
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({
+  res.status(err.status || 500).json({
     success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    message: err.message,
+    error: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 });
 
