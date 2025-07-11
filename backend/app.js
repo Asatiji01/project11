@@ -23,7 +23,8 @@ const allowedOrigins = [
   "https://expense-tracker-app-knl1.onrender.com",
   "https://expenstrackkerr.vercel.app",
   "https://project11-ywod.vercel.app",
-  "https://project11-ywod-git-main-devanshus-projects-9b36d403.vercel.app",
+  "https://expenstrackkerr-c2s739k0g-devanshus-projects-9b36d403.vercel.app",
+ 
   "https://project11-ywod-6cnubt266-devanshus-projects-9b36d403.vercel.app",
   // Wildcard patterns for Vercel preview URLs
   /^https:\/\/project11-ywod.*\.vercel\.app$/,
